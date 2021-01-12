@@ -15,13 +15,19 @@ public class GroundDetector : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 5f))
+        if(!Physics.Raycast(transform.position, Vector3.down, Mathf.Infinity))
         {
-            if(hit.point != null)
-            {
-                heroRigidbody.constraints = RigidbodyConstraints.None;
-                heroRigidbody.useGravity = true;
-            }     
+            heroRigidbody.constraints = RigidbodyConstraints.None;
+            heroRigidbody.useGravity = true;
+            heroRigidbody.isKinematic = false;
+        }
+        else
+        {
+            heroRigidbody.constraints = RigidbodyConstraints.FreezePositionY;
+            heroRigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+
+            heroRigidbody.useGravity = false;
+            heroRigidbody.isKinematic = true;
         }
     }
 }

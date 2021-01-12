@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour
 
     private readonly float maxSpeed = 0.1f;
     private readonly float minSpeed = 0.02f;
+    private readonly float dieAnimationLength = 2.167f;
 
     private void OnEnable()
     {
@@ -44,6 +45,9 @@ public class PlayerController : MonoBehaviour
             if (dir == Vector3.zero)
             {
                 speed = minSpeed;
+
+                archerAnimator.SetBool("Walk", false);
+                archerAnimator.SetBool("Run", false);
             }
             else
             {
@@ -75,9 +79,9 @@ public class PlayerController : MonoBehaviour
 
         if(transform.position.y < -0.2f)
         {
-            onPlayerDeath();
-
             gameObject.SetActive(false);
+
+            onPlayerDeath();
         }
     }
 
@@ -93,12 +97,14 @@ public class PlayerController : MonoBehaviour
     {
         isDead = true;
 
+        archerAnimator.SetBool("Walk", false);
+        archerAnimator.SetBool("Run", false);
         archerAnimator.SetBool("Die", true);
 
-        yield return new WaitForSeconds(3f);
-
-        onPlayerDeath();
+        yield return new WaitForSeconds(dieAnimationLength);
 
         gameObject.SetActive(false);
+
+        onPlayerDeath();
     }
 }

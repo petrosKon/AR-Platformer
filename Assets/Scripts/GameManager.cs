@@ -9,12 +9,12 @@ public class GameManager : MonoBehaviour
     public GameObject player;
     public GameObject spawnPoint;
 
-    private Rigidbody playerRigidbody;
+    private Rigidbody heroRigidbody;
 
     // Start is called befoe the first frame update
     void Start()
     {
-        playerRigidbody = player.GetComponent<Rigidbody>();
+        heroRigidbody = player.GetComponent<Rigidbody>();
 
         PlayerController.onPlayerDeath += SpawnPlayer;
     }
@@ -26,12 +26,16 @@ public class GameManager : MonoBehaviour
 
     IEnumerator PlayerSpawnCoroutine()
     {
-        yield return new WaitForSeconds(5f);
+        heroRigidbody.constraints = RigidbodyConstraints.FreezePositionY;
+        heroRigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+
+        heroRigidbody.useGravity = false;
+        heroRigidbody.isKinematic = true;
 
         player.transform.position = spawnPoint.transform.position;
         player.transform.rotation = spawnPoint.transform.rotation;
 
-        playerRigidbody.constraints = RigidbodyConstraints.FreezePositionY;
+        yield return new WaitForSeconds(5f);
 
         player.SetActive(true);
 
