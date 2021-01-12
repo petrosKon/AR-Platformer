@@ -7,6 +7,8 @@ TagManager:
   - Enemy
   - Ground
   - Joystick
+  - Spikes
+  - Star
   layers:
   - Default
   - TransparentFX
