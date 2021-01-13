@@ -9,6 +9,8 @@ TagManager:
   - Joystick
   - Spikes
   - Star
+  - Checkpoint
+  - Arrow
   layers:
   - Default
   - TransparentFX

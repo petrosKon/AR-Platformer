@@ -11,9 +11,21 @@ public class GameManager : MonoBehaviour
 
     private Rigidbody heroRigidbody;
 
+    public static GameManager instance;
+
     // Start is called befoe the first frame update
     void Start()
     {
+        if(instance != null)
+        {
+            Destroy(instance);
+        }
+        else
+        {
+            instance = this;
+            DontDestroyOnLoad(this.gameObject);
+        }
+
         heroRigidbody = player.GetComponent<Rigidbody>();
 
         PlayerController.onPlayerDeath += SpawnPlayer;

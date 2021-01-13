@@ -16,8 +16,13 @@ public class PlayerController : MonoBehaviour
     public GameObject crossBow;
 
     [Header("Player shooting properties")]
-    public int numOfArrows = 0;
     public GameObject firePoint;
+    public bool hasCrossbow = false;
+    public bool enemyDetected = false;
+
+    [Header("Particles")]
+    public GameObject deathParticles;
+    public GameObject starParticles;
 
     public static Action onPlayerDeath;
 
@@ -29,39 +34,83 @@ public class PlayerController : MonoBehaviour
     private readonly float minSpeed = 0.02f;
     private readonly float dieAnimationLength = 2.167f;
 
+    public static PlayerController instance;
+
     private void OnEnable()
     {
-        if(archerAnimator == null)
+        if (archerAnimator == null)
         {
             archerAnimator = GetComponent<Animator>();
         }
+
 
         isDead = false;
     }
 
     private void Start()
     {
-        Arrow.onArrowPickup += LoadPlayer;
+        if (instance != null)
+        {
+            Destroy(instance);
+        }
+        else
+        {
+            instance = this;
+        }
     }
 
-    private void LoadPlayer()
+    private void AddCrossbow()
     {
-        numOfArrows += 2;
+        hasCrossbow = true;
         arrow.SetActive(true);
         crossBow.SetActive(true);
         attackButton.gameObject.SetActive(true);
     }
 
+    //private void OnDrawGizmosSelected()
+    //{
+    //    Gizmos.DrawWireSphere(transform.position, 2f);
+
+    //}
+
     public void FixedUpdate()
     {
+        #region Enemy Detection
+        //Collider[] nearbyColliders = Physics.OverlapSphere(transform.position, 1.2f);
+        //Transform[] nearbyEnemies = new Transform[nearbyColliders.Length];
+        //int count = 0;
+
+        //enemyDetected = false;
+        //foreach (var collider in nearbyColliders)
+        //{
+        //    if (collider.CompareTag("Enemy"))
+        //    {
+        //        nearbyEnemies[count] = collider.transform;
+        //        count++;
+        //        enemyDetected = true;
+        //    }
+        //}
+        
+        #endregion
+
         #region Character Movement
         if (!isDead)
         {
             float hor = fixedJoystick.Horizontal;
             float ver = fixedJoystick.Vertical;
             Vector3 dir = new Vector3(hor, 0f, ver).normalized;
-            Vector3 lookAtPosition = transform.position + dir;
-            transform.LookAt(lookAtPosition);
+
+            if (!enemyDetected)
+            {
+                Vector3 lookAtPosition = transform.position + dir;
+                transform.LookAt(lookAtPosition);
+
+            }
+            else
+            {
+                //transform.LookAt(GetClosestEnemy(nearbyEnemies));
+            }
+
 
             if (dir == Vector3.zero)
             {
@@ -99,7 +148,7 @@ public class PlayerController : MonoBehaviour
         #endregion
 
         #region Death by falling
-        if (transform.position.y < -0.2f)
+        if (transform.position.y < -0.5f)
         {
             gameObject.SetActive(false);
 
@@ -108,15 +157,54 @@ public class PlayerController : MonoBehaviour
         #endregion
     }
 
+    Transform GetClosestEnemy(Transform[] enemies)
+    {
+        Transform bestTarget = null;
+        float closestDistanceSqr = Mathf.Infinity;
+        Vector3 currentPosition = transform.position;
+        foreach (Transform potentialTarget in enemies)
+        {
+            Vector3 directionToTarget = potentialTarget.position - currentPosition;
+            float dSqrToTarget = directionToTarget.sqrMagnitude;
+            if (dSqrToTarget < closestDistanceSqr)
+            {
+                closestDistanceSqr = dSqrToTarget;
+                bestTarget = potentialTarget;
+            }
+        }
+
+        return bestTarget;
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Enemy") || other.CompareTag("Spikes"))
         {
             StartCoroutine(KillPlayer());
 
-        } else if (other.CompareTag("Star"))
+        }
+        else if (other.CompareTag("Star"))
         {
+            Destroy(other.gameObject);
+
+            GameObject starParticlesClone = Instantiate(starParticles, other.transform.position, Quaternion.identity);
+            Destroy(starParticlesClone, 1.2f);
+
             archerAnimator.SetTrigger("Victory");
+
+        }
+        else if (other.CompareTag("Checkpoint"))
+        {
+            GameManager.instance.spawnPoint = other.GetComponent<Checkpoint>().spawnPoint;
+
+        }
+        else if (other.CompareTag("Arrow"))
+        {
+            AddCrossbow();
+
+            GameObject starParticlesClone = Instantiate(starParticles, other.transform.position, Quaternion.identity);
+            Destroy(starParticlesClone, 1.2f);
+
             Destroy(other.gameObject);
         }
     }
@@ -126,6 +214,9 @@ public class PlayerController : MonoBehaviour
         if (!isDead)
         {
             isDead = true;
+
+            GameObject deathParticlesClone = Instantiate(deathParticles, this.transform.position, Quaternion.identity);
+            Destroy(deathParticlesClone, 1.2f);
 
             archerAnimator.SetTrigger("Die");
 
