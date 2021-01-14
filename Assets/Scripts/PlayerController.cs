@@ -12,13 +12,16 @@ public class PlayerController : MonoBehaviour
     public Button attackButton;
 
     [Header("Arrow and Bolt")]
-    public GameObject arrow;
-    public GameObject crossBow;
+    public GameObject arrowHumanoid;
+    public GameObject crossBowHumanoid;
 
     [Header("Player shooting properties")]
     public GameObject firePoint;
+    public GameObject arrowProjectile;
     public bool hasCrossbow = false;
     public bool enemyDetected = false;
+    public float arrowSpeed;
+    public float timeBetweenShots = 2f;
 
     [Header("Particles")]
     public GameObject deathParticles;
@@ -35,6 +38,7 @@ public class PlayerController : MonoBehaviour
     private readonly float dieAnimationLength = 2.167f;
 
     public static PlayerController instance;
+    private Vector3 lookAtPosition;
 
     private void OnEnable()
     {
@@ -57,13 +61,28 @@ public class PlayerController : MonoBehaviour
         {
             instance = this;
         }
+
+        attackButton.onClick.AddListener(delegate
+        {
+            if(timeBetweenShots < 0f)
+            {
+                timeBetweenShots = 2f;
+
+                archerAnimator.SetTrigger("Arrow");
+
+                GameObject arrow = Instantiate(arrowProjectile, transform.position, transform.rotation) as GameObject;
+                arrow.transform.rotation = Quaternion.Euler(-90f, transform.rotation.eulerAngles.y, 0f);
+                arrow.GetComponent<Rigidbody>().AddForce(transform.forward * arrowSpeed, ForceMode.VelocityChange);
+                Destroy(arrow, 3f);
+            }
+        });
     }
 
     private void AddCrossbow()
     {
         hasCrossbow = true;
-        arrow.SetActive(true);
-        crossBow.SetActive(true);
+        arrowHumanoid.SetActive(true);
+        crossBowHumanoid.SetActive(true);
         attackButton.gameObject.SetActive(true);
     }
 
@@ -90,7 +109,7 @@ public class PlayerController : MonoBehaviour
         //        enemyDetected = true;
         //    }
         //}
-        
+
         #endregion
 
         #region Character Movement
@@ -102,7 +121,7 @@ public class PlayerController : MonoBehaviour
 
             if (!enemyDetected)
             {
-                Vector3 lookAtPosition = transform.position + dir;
+                lookAtPosition = transform.position + dir;
                 transform.LookAt(lookAtPosition);
 
             }
@@ -153,6 +172,13 @@ public class PlayerController : MonoBehaviour
             gameObject.SetActive(false);
 
             onPlayerDeath();
+        }
+        #endregion
+
+        #region Arrow Reload
+        if(timeBetweenShots >= 0f)
+        {
+            timeBetweenShots -= Time.fixedDeltaTime;
         }
         #endregion
     }
