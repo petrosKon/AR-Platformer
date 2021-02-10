@@ -13,6 +13,9 @@ public class GameManager : MonoBehaviour
 
     public static GameManager instance;
 
+    public static float ENEMY_DEATH_TIME = 1.65f;
+    public static float PLAYER_DEATH_TIME = 2.16f;
+
     // Start is called befoe the first frame update
     void Start()
     {

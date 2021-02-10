@@ -63,7 +63,7 @@ public class FlyEnemy : MonoBehaviour
         GameObject deathParticlesClone = Instantiate(deathParticlesEnemy, transform.position, Quaternion.identity);
         Destroy(deathParticlesClone, 1.2f);
 
-        yield return new WaitForSeconds(1.667f);
+        yield return new WaitForSeconds(GameManager.ENEMY_DEATH_TIME);
 
         Destroy(this.gameObject);
     }

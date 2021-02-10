@@ -19,7 +19,6 @@ public class PlayerController : MonoBehaviour
     public GameObject firePoint;
     public GameObject arrowProjectile;
     public bool hasCrossbow = false;
-    public bool enemyDetected = false;
     public float arrowSpeed;
     public float timeBetweenShots = 2f;
 
@@ -35,7 +34,6 @@ public class PlayerController : MonoBehaviour
 
     private readonly float maxSpeed = 0.1f;
     private readonly float minSpeed = 0.02f;
-    private readonly float dieAnimationLength = 2.167f;
 
     public static PlayerController instance;
     private Vector3 lookAtPosition;
@@ -86,32 +84,8 @@ public class PlayerController : MonoBehaviour
         attackButton.gameObject.SetActive(true);
     }
 
-    //private void OnDrawGizmosSelected()
-    //{
-    //    Gizmos.DrawWireSphere(transform.position, 2f);
-
-    //}
-
     public void FixedUpdate()
     {
-        #region Enemy Detection
-        //Collider[] nearbyColliders = Physics.OverlapSphere(transform.position, 1.2f);
-        //Transform[] nearbyEnemies = new Transform[nearbyColliders.Length];
-        //int count = 0;
-
-        //enemyDetected = false;
-        //foreach (var collider in nearbyColliders)
-        //{
-        //    if (collider.CompareTag("Enemy"))
-        //    {
-        //        nearbyEnemies[count] = collider.transform;
-        //        count++;
-        //        enemyDetected = true;
-        //    }
-        //}
-
-        #endregion
-
         #region Character Movement
         if (!isDead)
         {
@@ -119,18 +93,9 @@ public class PlayerController : MonoBehaviour
             float ver = fixedJoystick.Vertical;
             Vector3 dir = new Vector3(hor, 0f, ver).normalized;
 
-            if (!enemyDetected)
-            {
-                lookAtPosition = transform.position + dir;
-                transform.LookAt(lookAtPosition);
-
-            }
-            else
-            {
-                //transform.LookAt(GetClosestEnemy(nearbyEnemies));
-            }
-
-
+            lookAtPosition = transform.position + dir;
+            transform.LookAt(lookAtPosition);
+        
             if (dir == Vector3.zero)
             {
                 speed = minSpeed;
@@ -183,25 +148,6 @@ public class PlayerController : MonoBehaviour
         #endregion
     }
 
-    Transform GetClosestEnemy(Transform[] enemies)
-    {
-        Transform bestTarget = null;
-        float closestDistanceSqr = Mathf.Infinity;
-        Vector3 currentPosition = transform.position;
-        foreach (Transform potentialTarget in enemies)
-        {
-            Vector3 directionToTarget = potentialTarget.position - currentPosition;
-            float dSqrToTarget = directionToTarget.sqrMagnitude;
-            if (dSqrToTarget < closestDistanceSqr)
-            {
-                closestDistanceSqr = dSqrToTarget;
-                bestTarget = potentialTarget;
-            }
-        }
-
-        return bestTarget;
-    }
-
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Enemy") || other.CompareTag("Spikes"))
@@ -246,7 +192,7 @@ public class PlayerController : MonoBehaviour
 
             archerAnimator.SetTrigger("Die");
 
-            yield return new WaitForSeconds(dieAnimationLength);
+            yield return new WaitForSeconds(GameManager.PLAYER_DEATH_TIME);
 
             gameObject.SetActive(false);
 
