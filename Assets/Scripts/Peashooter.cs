@@ -62,6 +62,8 @@ public class Peashooter : MonoBehaviour
 
         peashooterAnimator.SetTrigger("Die");
 
+        GameManager.onEnemyKilled();
+
         yield return new WaitForSeconds(GameManager.ENEMY_DEATH_TIME);
 
         Destroy(this.gameObject);

@@ -60,6 +60,8 @@ public class FlyEnemy : MonoBehaviour
         flyAnimator.SetBool("Fly forward", false);
         flyAnimator.SetTrigger("Die");
 
+        GameManager.onEnemyKilled();
+
         GameObject deathParticlesClone = Instantiate(deathParticlesEnemy, transform.position, Quaternion.identity);
         Destroy(deathParticlesClone, 1.2f);
 

@@ -162,6 +162,8 @@ public class PlayerController : MonoBehaviour
             GameObject starParticlesClone = Instantiate(starParticles, other.transform.position, Quaternion.identity);
             Destroy(starParticlesClone, 1.2f);
 
+            GameManager.onStarPicked();
+
             archerAnimator.SetTrigger("Victory");
 
         }
