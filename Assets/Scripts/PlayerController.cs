@@ -62,17 +62,21 @@ public class PlayerController : MonoBehaviour
 
         attackButton.onClick.AddListener(delegate
         {
-            if(timeBetweenShots < 0f)
+            if (!isDead)
             {
-                timeBetweenShots = 2f;
+                if (timeBetweenShots < 0f)
+                {
+                    timeBetweenShots = 2f;
 
-                archerAnimator.SetTrigger("Arrow");
+                    archerAnimator.SetTrigger("Arrow");
 
-                GameObject arrow = Instantiate(arrowProjectile, transform.position, transform.rotation) as GameObject;
-                arrow.transform.rotation = Quaternion.Euler(-90f, transform.rotation.eulerAngles.y, 0f);
-                arrow.GetComponent<Rigidbody>().AddForce(transform.forward * arrowSpeed, ForceMode.VelocityChange);
-                Destroy(arrow, 3f);
+                    GameObject arrow = Instantiate(arrowProjectile, new Vector3(transform.position.x, transform.position.y + 0.1f, transform.position.z), transform.rotation) as GameObject;
+                    arrow.transform.rotation = Quaternion.Euler(-90f, transform.rotation.eulerAngles.y, 0f);
+                    arrow.GetComponent<Rigidbody>().AddForce(transform.forward * arrowSpeed, ForceMode.VelocityChange);
+                    Destroy(arrow, 3f);
+                }
             }
+           
         });
     }
 

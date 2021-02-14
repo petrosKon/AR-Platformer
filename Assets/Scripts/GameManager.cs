@@ -53,7 +53,7 @@ public class GameManager : MonoBehaviour
         player.transform.position = spawnPoint.transform.position;
         player.transform.rotation = spawnPoint.transform.rotation;
 
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(2f);
 
         player.SetActive(true);
 

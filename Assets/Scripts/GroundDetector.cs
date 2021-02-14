@@ -15,7 +15,7 @@ public class GroundDetector : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(!Physics.Raycast(transform.position, Vector3.down, Mathf.Infinity))
+        if(!Physics.Raycast(transform.position, Vector3.down, 0.5f))
         {
             heroRigidbody.constraints = RigidbodyConstraints.None;
             heroRigidbody.useGravity = true;
